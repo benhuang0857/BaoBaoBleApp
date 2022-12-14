@@ -1,4 +1,4 @@
-# BluetoothPrinter
+# BluetoothPrinter - BaoBao version
 
 
 ## Features:
