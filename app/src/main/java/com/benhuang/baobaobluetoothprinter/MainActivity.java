@@ -43,6 +43,7 @@ import java.util.UUID;
 
 import okhttp3.Call;
 import okhttp3.Callback;
+import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -409,7 +410,7 @@ public class MainActivity extends AppCompatActivity implements Runnable {
 
         // 建立Request，設置連線資訊
         Request request = new Request.Builder()
-                .url("https://itioi.com/api/orders")
+                .url("https://itioi.com/api/orders/unprinted")
                 .build();
         // 建立Call
         Call call = client.newCall(request);
@@ -503,11 +504,42 @@ public class MainActivity extends AppCompatActivity implements Runnable {
         });
     }
 
+    private void updateOrder(String passId) {
+
+        String url = "https://itioi.com/api/order/update?id=" + passId;
+
+        // 建立Request，設置連線資訊
+        Request request = new Request.Builder()
+                .url(url)
+                .build();
+        // 建立Call
+        Call call = client.newCall(request);
+
+        // 執行Call連線到網址
+        call.enqueue(new Callback() {
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (response.isSuccessful())
+                        {
+                            initHandler.sendEmptyMessage(1);
+                        }
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure(Call call, IOException e) {}
+        });
+    }
+
     private void makeData(@NonNull List<HashMap<String, String>> data) {
         for (int i = 0; i < data.size();i++){
             HashMap<String,String> hashMap = new HashMap<>();
 
-            hashMap.put("Id","訂單：" + data.get(i).get("OrderId"));
+            hashMap.put("Id", data.get(i).get("OrderId"));
             hashMap.put("Customer", data.get(i).get("OrderName"));
             hashMap.put("Address", data.get(i).get("OrderAddress"));
             hashMap.put("Mobile", data.get(i).get("OrderMobile"));
@@ -562,8 +594,10 @@ public class MainActivity extends AppCompatActivity implements Runnable {
             });
 
             holder.btnPrint.setOnClickListener((v)->{
-                freshHandler.sendEmptyMessage(1);
 
+                String id = orderArrayList.get(position).get("Id").toString();
+                updateOrder(id);
+                freshHandler.sendEmptyMessage(1);
                 printContext(orderArrayList.get(position).get("Customer"));
             });
         }
