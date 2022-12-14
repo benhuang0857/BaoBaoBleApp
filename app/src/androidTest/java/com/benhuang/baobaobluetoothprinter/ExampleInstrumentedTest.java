@@ -1,4 +1,4 @@
-package com.sanxynet.bluetoothprinter;
+package com.benhuang.baobaobluetoothprinter;
 
 import android.content.Context;
 import androidx.test.platform.app.InstrumentationRegistry;

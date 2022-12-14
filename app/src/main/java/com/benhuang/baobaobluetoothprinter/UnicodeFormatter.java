@@ -1,4 +1,4 @@
-package com.sanxynet.bluetoothprinter;
+package com.benhuang.baobaobluetoothprinter;
 
 /**
  * Created by sanxy on 6/02/2020.

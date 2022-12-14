@@ -1,4 +1,4 @@
-package com.sanxynet.bluetoothprinter;
+package com.benhuang.baobaobluetoothprinter;
 
 import android.view.LayoutInflater;
 import android.view.View;

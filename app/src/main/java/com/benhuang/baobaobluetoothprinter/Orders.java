@@ -1,4 +1,4 @@
-package com.sanxynet.bluetoothprinter;
+package com.benhuang.baobaobluetoothprinter;
 
 import com.google.gson.JsonObject;
 
