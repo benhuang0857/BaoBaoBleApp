@@ -51,6 +51,8 @@ import taobe.tec.jcc.JChineseConvertor;
 
 public class MainActivity extends AppCompatActivity implements Runnable {
 
+    public static final int LOGIN_RESULT = 3;
+    public String mAccount = "NOSETTING";
     protected static final String TAG = "MainActivity";
     private static final int REQUEST_CONNECT_DEVICE = 1;
     private static final int REQUEST_ENABLE_BT = 2;
@@ -60,7 +62,7 @@ public class MainActivity extends AppCompatActivity implements Runnable {
     MyListAdapter myListAdapter;
     private ArrayList<HashMap<String,String>> orderArrayList = new ArrayList<>();
     private List<HashMap<String, String>> datas = new ArrayList<>();
-    Button mGetPrintedOrdersBtn, mGetUnPrintedOrdersBtn, mScan, mPrint;
+    Button mGetPrintedOrdersBtn, mGetUnPrintedOrdersBtn, mGetLoginBtn, mScan, mPrint;
     TextView stat;
 
     BluetoothAdapter mBluetoothAdapter;
@@ -150,8 +152,6 @@ public class MainActivity extends AppCompatActivity implements Runnable {
         });
 
         mGetUnPrintedOrdersBtn = findViewById(R.id.get_unprinted_orders_btn);
-        mGetPrintedOrdersBtn = findViewById(R.id.get_printed_orders_btn);
-
         mGetUnPrintedOrdersBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -161,6 +161,8 @@ public class MainActivity extends AppCompatActivity implements Runnable {
                 myListAdapter.notifyDataSetChanged();
             }
         });
+
+        mGetPrintedOrdersBtn = findViewById(R.id.get_printed_orders_btn);
         mGetPrintedOrdersBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -168,6 +170,15 @@ public class MainActivity extends AppCompatActivity implements Runnable {
                 orderArrayList.clear();
                 getPrintedOrders();
                 myListAdapter.notifyDataSetChanged();
+            }
+        });
+
+        mGetLoginBtn = findViewById(R.id.get_login_btn);
+        mGetLoginBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                startActivityForResult(intent, LOGIN_RESULT);
             }
         });
 
@@ -302,6 +313,16 @@ public class MainActivity extends AppCompatActivity implements Runnable {
                     Toast.makeText(MainActivity.this, "Not connected to any device", Toast.LENGTH_SHORT).show();
                 }
                 break;
+
+            case LOGIN_RESULT:
+                if (mResultCode == Activity.RESULT_OK) {
+                    Bundle mExtra = mDataIntent.getExtras();
+                    mAccount = mExtra.getString("account");
+                    Log.v(TAG, "mAccount " + mAccount);
+                } else {
+                    Toast.makeText(MainActivity.this, "Not connected to any device", Toast.LENGTH_SHORT).show();
+                }
+                break;
         }
     }
 
@@ -408,100 +429,108 @@ public class MainActivity extends AppCompatActivity implements Runnable {
 
     private void getUnPrintedOrder() {
 
-        // 建立Request，設置連線資訊
-        Request request = new Request.Builder()
-                .url("https://itioi.com/api/orders/unprinted")
-                .build();
-        // 建立Call
-        Call call = client.newCall(request);
+        if (mAccount != "NOSETTING")
+        {
+            // 建立Request，設置連線資訊
+            Request request = new Request.Builder()
+                    .url("https://itioi.com/api/orders/unprinted")
+                    .build();
+            // 建立Call
+            Call call = client.newCall(request);
 
-        // 執行Call連線到網址
-        call.enqueue(new Callback() {
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                // 連線成功，自response取得連線結果
-                String result = response.body().string();
+            // 執行Call連線到網址
+            call.enqueue(new Callback() {
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+                    // 連線成功，自response取得連線結果
+                    String result = response.body().string();
 
-                Gson gson = new Gson();
-                Orders[] orderArray = gson.fromJson(result, Orders[].class);
+                    Gson gson = new Gson();
+                    Orders[] orderArray = gson.fromJson(result, Orders[].class);
 
-                for (Orders order : orderArray)
-                {
-                    HashMap<String,String> hashMap = new HashMap<>();
-                    hashMap.put("OrderId", order.getOrderId());
-                    hashMap.put("OrderName", order.getOrderName());
-                    hashMap.put("OrderAddress", order.getOrderAddress());
-                    hashMap.put("OrderMobile", order.getOrderMobile());
-                    hashMap.put("Orders", order.getOrders());
-                    hashMap.put("OrderStatus", order.getOrderStatus());
-                    hashMap.put("OrderCreatedAt", order.getOrderCreatedAt());
+                    for (Orders order : orderArray)
+                    {
+                        HashMap<String,String> hashMap = new HashMap<>();
+                        hashMap.put("OrderId", order.getOrderId());
+                        hashMap.put("OrderName", order.getOrderName());
+                        hashMap.put("OrderAddress", order.getOrderAddress());
+                        hashMap.put("OrderMobile", order.getOrderMobile());
+                        hashMap.put("Orders", order.getOrders());
+                        hashMap.put("OrderStatus", order.getOrderStatus());
+                        hashMap.put("OrderCreatedAt", order.getOrderCreatedAt());
 
-                    datas.add(hashMap);
+                        datas.add(hashMap);
+                    }
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (response.isSuccessful())
+                            {
+                                initHandler.sendEmptyMessage(1);
+                            }
+                        }
+                    });
                 }
 
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (response.isSuccessful())
-                        {
-                            initHandler.sendEmptyMessage(1);
-                        }
-                    }
-                });
-            }
+                @Override
+                public void onFailure(Call call, IOException e) {}
+            });
+        }
 
-            @Override
-            public void onFailure(Call call, IOException e) {}
-        });
     }
 
     private void getPrintedOrders() {
 
-        // 建立Request，設置連線資訊
-        Request request = new Request.Builder()
-                .url("https://itioi.com/api/orders/printed")
-                .build();
-        // 建立Call
-        Call call = client.newCall(request);
+        if (mAccount != "NOSETTING")
+        {
+            // 建立Request，設置連線資訊
+            Request request = new Request.Builder()
+                    .url("https://itioi.com/api/orders/printed")
+                    .build();
+            // 建立Call
+            Call call = client.newCall(request);
 
-        // 執行Call連線到網址
-        call.enqueue(new Callback() {
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                // 連線成功，自response取得連線結果
-                String result = response.body().string();
+            // 執行Call連線到網址
+            call.enqueue(new Callback() {
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+                    // 連線成功，自response取得連線結果
+                    String result = response.body().string();
 
-                Gson gson = new Gson();
-                Orders[] orderArray = gson.fromJson(result, Orders[].class);
+                    Gson gson = new Gson();
+                    Orders[] orderArray = gson.fromJson(result, Orders[].class);
 
-                for (Orders order : orderArray)
-                {
-                    HashMap<String,String> hashMap = new HashMap<>();
-                    hashMap.put("OrderId", order.getOrderId());
-                    hashMap.put("OrderName", order.getOrderName());
-                    hashMap.put("OrderAddress", order.getOrderAddress());
-                    hashMap.put("OrderMobile", order.getOrderMobile());
-                    hashMap.put("Orders", order.getOrders());
-                    hashMap.put("OrderStatus", order.getOrderStatus());
-                    hashMap.put("OrderCreatedAt", order.getOrderCreatedAt());
+                    for (Orders order : orderArray)
+                    {
+                        HashMap<String,String> hashMap = new HashMap<>();
+                        hashMap.put("OrderId", order.getOrderId());
+                        hashMap.put("OrderName", order.getOrderName());
+                        hashMap.put("OrderAddress", order.getOrderAddress());
+                        hashMap.put("OrderMobile", order.getOrderMobile());
+                        hashMap.put("Orders", order.getOrders());
+                        hashMap.put("OrderStatus", order.getOrderStatus());
+                        hashMap.put("OrderCreatedAt", order.getOrderCreatedAt());
 
-                    datas.add(hashMap);
+                        datas.add(hashMap);
+                    }
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (response.isSuccessful())
+                            {
+                                initHandler.sendEmptyMessage(1);
+                            }
+                        }
+                    });
                 }
 
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (response.isSuccessful())
-                        {
-                            initHandler.sendEmptyMessage(1);
-                        }
-                    }
-                });
-            }
+                @Override
+                public void onFailure(Call call, IOException e) {}
+            });
+        }
 
-            @Override
-            public void onFailure(Call call, IOException e) {}
-        });
     }
 
     private void updateOrder(String passId) {

@@ -32,12 +32,12 @@
             android:text="已列印訂單" />
 
         <Button
-            android:id="@+id/button5"
+            android:id="@+id/get_login_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@color/BaoBaoPrim"
-            android:text="Button" />
+            android:text="登入" />
     </LinearLayout>
 
     <LinearLayout
@@ -63,7 +63,7 @@
     <LinearLayout
         android:id="@+id/recycle_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="470dp"
         android:layout_below="@+id/top_logo"
         tools:layout_editor_absoluteX="1dp">
 

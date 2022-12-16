@@ -15,15 +15,17 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-
-        <activity android:name="com.benhuang.baobaobluetoothprinter.MainActivity">
+        <activity
+            android:name=".LoginActivity"
+            android:exported="false" />
+        <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-            <activity android:name="com.benhuang.baobaobluetoothprinter.DeviceListActivity"/>
+        <activity android:name=".DeviceListActivity" />
     </application>
 
 </manifest>
