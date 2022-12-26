@@ -63,8 +63,9 @@
     <LinearLayout
         android:id="@+id/recycle_layout"
         android:layout_width="match_parent"
-        android:layout_height="470dp"
+        android:layout_height="match_parent"
         android:layout_below="@+id/top_logo"
+        android:layout_marginBottom="100dp"
         tools:layout_editor_absoluteX="1dp">
 
         <androidx.swiperefreshlayout.widget.SwipeRefreshLayout

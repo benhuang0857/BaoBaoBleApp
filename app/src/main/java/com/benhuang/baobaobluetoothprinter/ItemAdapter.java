@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
-public class ItemAdapter  extends RecyclerView.Adapter<ItemAdapter.ViewHolder>{
+public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder>{
     private ArrayList<Orders> data;
 
     //建構子，順便傳入要顯示的資料

@@ -27,10 +27,10 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 mAccountInput = findViewById(R.id.account_input);
-                mPasswdInput = findViewById(R.id.passwd_input);
+                // mPasswdInput = findViewById(R.id.passwd_input);
 
                 String account = mAccountInput.getText().toString();
-                String passwd = mPasswdInput.getText().toString();
+                // String passwd = mPasswdInput.getText().toString();
 
                 Bundle mBundle = new Bundle();
                 mBundle.putString("account", account);

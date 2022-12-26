@@ -37,7 +37,7 @@ public class MyListAdapter extends RecyclerView.Adapter<MyListAdapter.ViewHolder
             printOrderMobile = itemView.findViewById(R.id.printOrderMobile);
             printOrders  = itemView.findViewById(R.id.printOrders);
             txtItem = (TextView) itemView.findViewById(R.id.printOrderMobile);
-            btnPrint = (Button) itemView.findViewById(R.id.button3);
+            btnPrint = (Button) itemView.findViewById(R.id.printBtn);
         }
     }
 
