@@ -10,7 +10,6 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
         android:layout_marginTop="10dp">
 
         <TextView
@@ -18,7 +17,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@color/BaoBaoPrim"
-            android:textSize="13dp"
             android:paddingStart="10dp"
             android:paddingTop="20dp"
             android:paddingBottom="20dp"
@@ -31,7 +29,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/BaoBaoPrim"
-            android:textSize="13dp"
             android:paddingStart="10dp"
             android:paddingTop="20dp"
             android:paddingBottom="20dp"
@@ -230,6 +227,34 @@
 
         <TextView
             android:id="@+id/printCreateAt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="8"
+            android:text="TextView"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="#000"
+            android:textSize="18sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginStart="20dp"
+        android:layout_marginBottom="10dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/textTableware"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.3"
+            android:text="餐具："
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="#000"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/printTableware"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="8"

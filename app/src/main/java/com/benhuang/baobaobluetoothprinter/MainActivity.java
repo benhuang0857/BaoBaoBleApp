@@ -62,6 +62,8 @@ public class MainActivity extends AppCompatActivity implements Runnable {
     private static final int REQUEST_ENABLE_BT = 2;
 
     private RecyclerView mRecyclerView;
+    private TextView emptyView;
+
     SwipeRefreshLayout swipeRefreshLayout;
     MyListAdapter myListAdapter;
     private ArrayList<HashMap<String,String>> orderArrayList = new ArrayList<>();
@@ -124,6 +126,7 @@ public class MainActivity extends AppCompatActivity implements Runnable {
         mRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         myListAdapter = new MyListAdapter(MainActivity.this, datas);
         mRecyclerView.setAdapter(myListAdapter);
+
         //下拉刷新
         swipeRefreshLayout = findViewById(R.id.refreshLayout);
         swipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.blue_RURI));
@@ -213,6 +216,7 @@ public class MainActivity extends AppCompatActivity implements Runnable {
                 datas.clear();
                 orderArrayList.clear();
                 getUnPrintedOrder();
+
                 myListAdapter.notifyDataSetChanged();
             }
         });
@@ -276,6 +280,10 @@ public class MainActivity extends AppCompatActivity implements Runnable {
                     String status = "";
                     String header9 = "";
                     String createat = "";
+                    String header10 = "";
+                    String tableware = "";
+                    String header11 = "";
+                    String NO = "";
                     String footer = "";
 
                     JChineseConvertor jChineseConvertor = JChineseConvertor.getInstance();
@@ -314,39 +322,69 @@ public class MainActivity extends AppCompatActivity implements Runnable {
                     total = req.get(position).get("Total") + "\n";
                     total = jChineseConvertor.t2s(total)
                             + "--------------------------------\n";
-//                    header8 = "Status:\n";
-//                    status = req.get(position).get("Status") + "\n";
-//                    status = jChineseConvertor.t2s(status)
-//                            + "--------------------------------\n";
+                    header8 = "Status:\n";
+                    status = req.get(position).get("Status") + "\n";
+                    status = jChineseConvertor.t2s(status)
+                            + "--------------------------------\n";
                     header9 = "Time:\n";
                     createat = req.get(position).get("CreatedAt") + "\n";
                     createat = jChineseConvertor.t2s(createat)
                             + "--------------------------------\n";
 
+                    header10 = "Tableware:\n";
+                    tableware = req.get(position).get("Tableware") + "\n";
+                    tableware = jChineseConvertor.t2s(tableware)
+                            + "--------------------------------\n";
+
+                    header11 = "No:\n";
+                    NO = req.get(position).get("No") + "\n";
+                    NO = jChineseConvertor.t2s(NO)
+                            + "--------------------------------\n";
+
                     footer = "         BaoBaoPu CO.\n\n\n\n\n\n\n\n\n";
 
-                    byte[] fontstyle = new byte[]{0x1B,0x21,0x08}; // 3- bold with large text
-
+                    byte[] fontstyle = new byte[]{0x1B,0x21,0x08}; // normal
                     os.write(fontstyle);
 
                     os.write(blank.getBytes("GB2312"));
                     os.write(header1.getBytes("GB2312"));
-                    os.write(header2.getBytes("GB2312"));
-                    os.write(customer.getBytes("GB2312"));
-                    os.write(header3.getBytes("GB2312"));
-                    os.write(address.getBytes("GB2312"));
-                    os.write(header4.getBytes("GB2312"));
-                    os.write(orders.getBytes("GB2312"));
-                    os.write(header5.getBytes("GB2312"));
-                    os.write(mobile.getBytes("GB2312"));
-                    os.write(header6.getBytes("GB2312"));
-                    os.write(discount.getBytes("GB2312"));
-                    os.write(header7.getBytes("GB2312"));
-                    os.write(total.getBytes("GB2312"));
-                    os.write(header8.getBytes("GB2312"));
-                    os.write(status.getBytes("GB2312"));
+
+                    os.write(header11.getBytes("GB2312"));
+                    os.write(NO.getBytes("GB2312"));
+
+                    fontstyle = new byte[]{0x1B,0x21,0x16}; // 3- bold with large text
+                    os.write(fontstyle);
+
                     os.write(header9.getBytes("GB2312"));
                     os.write(createat.getBytes("GB2312"));
+
+                    os.write(header2.getBytes("GB2312"));
+                    os.write(customer.getBytes("GB2312"));
+
+                    os.write(header3.getBytes("GB2312"));
+                    os.write(address.getBytes("GB2312"));
+
+                    fontstyle = new byte[]{0x1B,0x21,0x08}; // normal
+                    os.write(fontstyle);
+
+                    os.write(header4.getBytes("GB2312"));
+                    os.write(orders.getBytes("GB2312"));
+
+                    os.write(header5.getBytes("GB2312"));
+                    os.write(mobile.getBytes("GB2312"));
+
+                    os.write(header6.getBytes("GB2312"));
+                    os.write(discount.getBytes("GB2312"));
+
+                    os.write(header7.getBytes("GB2312"));
+                    os.write(total.getBytes("GB2312"));
+
+                    os.write(header10.getBytes("GB2312"));
+                    os.write(tableware.getBytes("GB2312"));
+
+//                    os.write(header8.getBytes("GB2312"));
+//                    os.write(status.getBytes("GB2312"));
+
                     os.write(footer.getBytes("GB2312"));
 
 //                    // Setting height
@@ -441,15 +479,18 @@ public class MainActivity extends AppCompatActivity implements Runnable {
 
                     footer = "         BaoBaoPu CO.\n\n\n\n\n\n\n\n\n";
 
-                    byte[] fontstyle = new byte[]{0x1B,0x21,0x08}; // 3- bold with large text
-                    os.write(fontstyle);
-
                     os.write(blank.getBytes("GB2312"));
                     os.write(header1.getBytes("GB2312"));
+
+                    byte[] fontstyle = new byte[]{0x1B,0x21,0x16}; // 3- bold with large text
+                    os.write(fontstyle);
+
                     os.write(header2.getBytes("GB2312"));
                     os.write(customer.getBytes("GB2312"));
                     os.write(header3.getBytes("GB2312"));
                     os.write(address.getBytes("GB2312"));
+                    fontstyle = new byte[]{0x1B,0x21,0x08}; // 3- bold with large text
+                    os.write(fontstyle);
                     os.write(header4.getBytes("GB2312"));
                     os.write(orders.getBytes("GB2312"));
                     os.write(header5.getBytes("GB2312"));
@@ -465,10 +506,10 @@ public class MainActivity extends AppCompatActivity implements Runnable {
                     os.write(footer.getBytes("GB2312"));
 
                     // 切紙ESC指令
-                    os.write(new byte[]{0x1D, 0x56, 0x01});
-
-                    String value = new String(new byte[]{0x1D, 0x56, 0x01});
-                    Log.d("MyRun: ", value);
+                    os.write(new byte[]{ 0x1D,
+                            0x56,
+                            66,
+                            0x00});
 
                 } catch (Exception e) {
                     Log.e("PrintActivity", "Exe ", e);
@@ -606,6 +647,21 @@ public class MainActivity extends AppCompatActivity implements Runnable {
                     makeData(datas);
                     mRecyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
                     mRecyclerView.setAdapter(new MyListAdapter(MainActivity.this, datas));
+
+                    emptyView = (TextView) findViewById(R.id.empty_view);
+
+                    boolean r = (myListAdapter.getItemCount() != 0);
+                    int j = myListAdapter.getItemCount();
+
+                    if (myListAdapter.getItemCount() != 0) {
+                        mRecyclerView.setVisibility(View.VISIBLE);
+                        emptyView.setVisibility(View.GONE);
+                    }
+                    else {
+                        mRecyclerView.setVisibility(View.GONE);
+                        emptyView.setVisibility(View.VISIBLE);
+                    }
+
                     break;
             }
         }
@@ -671,12 +727,14 @@ public class MainActivity extends AppCompatActivity implements Runnable {
                             HashMap<String,String> hashMap = new HashMap<>();
 
                             hashMap.put("OrderId", order.getOrderId());
+                            hashMap.put("OrderNum", order.getOrderNum());
                             hashMap.put("OrderName", order.getOrderName());
                             hashMap.put("OrderAddress", order.getOrderAddress());
                             hashMap.put("OrderMobile", order.getOrderMobile());
                             hashMap.put("Orders", order.getOrders());
                             hashMap.put("OrderDiscount", order.getDiscount());
                             hashMap.put("OrderTotal", order.getTotal());
+                            hashMap.put("OrderTableware", order.getTableware());
                             hashMap.put("OrderStatus", order.getOrderStatus());
                             hashMap.put("OrderCreatedAt", order.getOrderCreatedAt());
 
@@ -732,12 +790,14 @@ public class MainActivity extends AppCompatActivity implements Runnable {
                             HashMap<String,String> hashMap = new HashMap<>();
 
                             hashMap.put("OrderId", order.getOrderId());
+                            hashMap.put("OrderNum", order.getOrderNum());
                             hashMap.put("OrderName", order.getOrderName());
                             hashMap.put("OrderAddress", order.getOrderAddress());
                             hashMap.put("OrderMobile", order.getOrderMobile());
                             hashMap.put("Orders", order.getOrders());
                             hashMap.put("OrderDiscount", order.getDiscount());
                             hashMap.put("OrderTotal", order.getTotal());
+                            hashMap.put("OrderTableware", order.getTableware());
                             hashMap.put("OrderStatus", order.getOrderStatus());
                             hashMap.put("OrderCreatedAt", order.getOrderCreatedAt());
 
@@ -851,12 +911,14 @@ public class MainActivity extends AppCompatActivity implements Runnable {
             HashMap<String,String> hashMap = new HashMap<>();
 
             hashMap.put("Id", data.get(i).get("OrderId"));
+            hashMap.put("No", data.get(i).get("OrderNum"));
             hashMap.put("Customer", data.get(i).get("OrderName"));
             hashMap.put("Address", data.get(i).get("OrderAddress"));
             hashMap.put("Mobile", data.get(i).get("OrderMobile"));
             hashMap.put("Orders", data.get(i).get("Orders"));
             hashMap.put("Discount", data.get(i).get("OrderDiscount"));
             hashMap.put("Total", data.get(i).get("OrderTotal"));
+            hashMap.put("Tableware", data.get(i).get("OrderTableware"));
             hashMap.put("Status", data.get(i).get("OrderStatus"));
             hashMap.put("CreatedAt", data.get(i).get("OrderCreatedAt"));
 
@@ -870,7 +932,7 @@ public class MainActivity extends AppCompatActivity implements Runnable {
 
         class ViewHolder extends RecyclerView.ViewHolder{
             private TextView txtItem, printOrderId,printOrderName, printOrderMobile,
-                    printOrderAddress,printOrders, printDiscount, printTotal, printStatus ,printCreateAt;
+                    printOrderAddress,printOrders, printDiscount, printTotal, printStatus, printTableware ,printCreateAt;
             private View mView;
             private Button btnPrint, btnCancel;
 
@@ -883,6 +945,7 @@ public class MainActivity extends AppCompatActivity implements Runnable {
                 printOrders  = itemView.findViewById(R.id.printOrders);
                 printDiscount = itemView.findViewById(R.id.printDiscount);
                 printTotal = itemView.findViewById(R.id.printTotal);
+                printTableware = itemView.findViewById(R.id.printTableware);
                 printStatus = itemView.findViewById(R.id.printStatus);
                 printCreateAt = itemView.findViewById(R.id.printCreateAt);
 
@@ -904,13 +967,14 @@ public class MainActivity extends AppCompatActivity implements Runnable {
 
         @Override
         public void onBindViewHolder(@NonNull ViewHolder holder, @SuppressLint("RecyclerView") int position) {
-            holder.printOrderId.setText(orderArrayList.get(position).get("Id"));
+            holder.printOrderId.setText(orderArrayList.get(position).get("No"));
             holder.printOrderName.setText(orderArrayList.get(position).get("Customer"));
             holder.printOrderAddress.setText(orderArrayList.get(position).get("Address"));
             holder.printOrderMobile.setText(orderArrayList.get(position).get("Mobile"));
             holder.printOrders.setText(orderArrayList.get(position).get("Orders"));
             holder.printDiscount.setText(orderArrayList.get(position).get("Discount"));
             holder.printTotal.setText(orderArrayList.get(position).get("Total"));
+            holder.printTableware.setText(orderArrayList.get(position).get("Tableware"));
             holder.printStatus.setText(orderArrayList.get(position).get("Status"));
             holder.printCreateAt.setText(orderArrayList.get(position).get("CreatedAt"));
 
