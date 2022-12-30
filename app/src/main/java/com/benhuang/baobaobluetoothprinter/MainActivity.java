@@ -57,6 +57,7 @@ public class MainActivity extends AppCompatActivity implements Runnable {
 
     public static final int LOGIN_RESULT = 3;
     public String mAccount = "NOSETTING";
+    boolean isLogin = false;
     protected static final String TAG = "MainActivity";
     private static final int REQUEST_CONNECT_DEVICE = 1;
     private static final int REQUEST_ENABLE_BT = 2;
@@ -96,36 +97,14 @@ public class MainActivity extends AppCompatActivity implements Runnable {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        initView();
-        getUnPrintedOrder();
-
-        // 建立Request，設置連線資訊
-        Request request = new Request.Builder()
-                .url("https://admin.baobaopuo.com/admin/api/orders")
-                .addHeader("api-key", "U76rRwRDwB7svAjraLFhBAXUWyKQdkz9")
-                .build();
-        // 建立Call
-        Call call = client.newCall(request);
-
-        // 執行Call連線到網址
-        call.enqueue(new Callback() {
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                // 連線成功，自response取得連線結果
-                String result = response.body().string();
-                // Log.d(TAG, "baobao: " + result);
-            }
-
-            @Override
-            public void onFailure(Call call, IOException e) {}
-        });
-
         //設置RecycleView
         mRecyclerView = findViewById(R.id.recycleview);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         myListAdapter = new MyListAdapter(MainActivity.this, datas);
         mRecyclerView.setAdapter(myListAdapter);
+
+        emptyScreen();
 
         //下拉刷新
         swipeRefreshLayout = findViewById(R.id.refreshLayout);
@@ -157,7 +136,7 @@ public class MainActivity extends AppCompatActivity implements Runnable {
                     dingSound.start();
                 }
 
-                freshHandler.postDelayed(this, 30*1000);
+                freshHandler.postDelayed(this, 10*1000);
             }
         });
 
@@ -386,6 +365,12 @@ public class MainActivity extends AppCompatActivity implements Runnable {
 //                    os.write(status.getBytes("GB2312"));
 
                     os.write(footer.getBytes("GB2312"));
+
+                    // 切紙ESC指令
+                    os.write(new byte[]{ 0x1D,
+                            0x56,
+                            66,
+                            0x00});
 
 //                    // Setting height
 //                    int gs = 29;
@@ -617,8 +602,8 @@ public class MainActivity extends AppCompatActivity implements Runnable {
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            mBluetoothConnectProgressDialog.dismiss();
 
+            mBluetoothConnectProgressDialog.dismiss();
             stat.setText("");
             stat.setText("Connected");
             stat.setTextColor(Color.rgb(97, 170, 74));
@@ -637,6 +622,22 @@ public class MainActivity extends AppCompatActivity implements Runnable {
         return b[3];
     }
 
+    public void emptyScreen() {
+        emptyView = (TextView) findViewById(R.id.empty_view);
+
+        boolean r = (myListAdapter.getItemCount() != 0);
+        int j = myListAdapter.getItemCount();
+
+        if (myListAdapter.getItemCount() != 0) {
+            mRecyclerView.setVisibility(View.VISIBLE);
+            emptyView.setVisibility(View.GONE);
+        }
+        else {
+            mRecyclerView.setVisibility(View.GONE);
+            emptyView.setVisibility(View.VISIBLE);
+        }
+    }
+
     //Init
     private Handler initHandler = new Handler(){
         @Override
@@ -647,21 +648,7 @@ public class MainActivity extends AppCompatActivity implements Runnable {
                     makeData(datas);
                     mRecyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
                     mRecyclerView.setAdapter(new MyListAdapter(MainActivity.this, datas));
-
-                    emptyView = (TextView) findViewById(R.id.empty_view);
-
-                    boolean r = (myListAdapter.getItemCount() != 0);
-                    int j = myListAdapter.getItemCount();
-
-                    if (myListAdapter.getItemCount() != 0) {
-                        mRecyclerView.setVisibility(View.VISIBLE);
-                        emptyView.setVisibility(View.GONE);
-                    }
-                    else {
-                        mRecyclerView.setVisibility(View.GONE);
-                        emptyView.setVisibility(View.VISIBLE);
-                    }
-
+                    emptyScreen();
                     break;
             }
         }
@@ -673,8 +660,13 @@ public class MainActivity extends AppCompatActivity implements Runnable {
             super.handleMessage(msg);
             switch (msg.what){
                 case 1:
-                    //設置RecycleView
 
+                    if (isLogin == true)
+                    {
+                        findViewById(R.id.loadingProgressBar).setVisibility(View.VISIBLE);
+                    }
+
+                    //設置RecycleView
                     printed_orders_page = true;
                     unprinted_orders_page = false;
 
@@ -718,6 +710,9 @@ public class MainActivity extends AppCompatActivity implements Runnable {
 
                     try {
                         // 連線成功，自response取得連線結果
+
+                        isLogin = true;
+
                         String result = response.body().string();
                         Gson gson = new Gson();
                         Orders[] orderArray = gson.fromJson(result, Orders[].class);
@@ -924,6 +919,8 @@ public class MainActivity extends AppCompatActivity implements Runnable {
 
             orderArrayList.add(hashMap);
         }
+
+        findViewById(R.id.loadingProgressBar).setVisibility(View.GONE);
     }
 
     private class MyListAdapter extends RecyclerView.Adapter<MyListAdapter.ViewHolder>{

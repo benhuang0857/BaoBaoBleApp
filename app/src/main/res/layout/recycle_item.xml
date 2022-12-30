@@ -303,7 +303,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="2dp"
             android:layout_weight="1"
-            android:background="@color/BaoBaoPrim"
+            android:background="@drawable/mybutton"
             android:text="接單" />
 
         <Button
@@ -312,7 +312,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="2dp"
             android:layout_weight="1"
-            android:background="@color/red_GINSYU"
+            android:background="@drawable/mycancelbutton"
             android:text="棄單" />
 
     </LinearLayout>
