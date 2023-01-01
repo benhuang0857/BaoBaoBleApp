@@ -3,24 +3,24 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="10dp"
-    android:background="?android:attr/selectableItemBackground"
+    android:paddingBottom="10dp"
+    android:background="@drawable/borderbottom"
     android:orientation="vertical">
-
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp">
+        android:paddingStart="5dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:background="@color/BaoBaoPrim">
 
         <TextView
             android:id="@+id/orderIdTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@color/BaoBaoPrim"
-            android:paddingStart="10dp"
-            android:paddingTop="20dp"
-            android:paddingBottom="20dp"
             android:text="訂單："
+            android:drawableLeft="@android:drawable/ic_menu_more"
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
             android:textColor="?attr/colorBackgroundFloating" />
 
@@ -28,11 +28,7 @@
             android:id="@+id/printOrderId"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/BaoBaoPrim"
-            android:paddingStart="10dp"
-            android:paddingTop="20dp"
-            android:paddingBottom="20dp"
-            android:text="訂單："
+            android:text="XXX"
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
             android:textColor="?attr/colorBackgroundFloating" />
     </LinearLayout>
@@ -303,6 +299,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="2dp"
             android:layout_weight="1"
+            android:textColor="@color/white"
             android:background="@drawable/mybutton"
             android:text="接單" />
 
@@ -312,6 +309,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="2dp"
             android:layout_weight="1"
+            android:textColor="@color/white"
             android:background="@drawable/mycancelbutton"
             android:text="棄單" />
 

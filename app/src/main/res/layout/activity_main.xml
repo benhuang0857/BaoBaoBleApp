@@ -20,6 +20,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:padding="2dp"
+            android:textColor="@color/white"
+            android:drawableLeft="@android:drawable/ic_menu_today"
             android:background="@color/BaoBaoPrim"
             android:text="最新訂單" />
 
@@ -28,6 +31,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:padding="2dp"
+            android:textColor="@color/white"
+            android:drawableStart="@drawable/ic_print_black_24dp"
             android:background="@color/BaoBaoPrim"
             android:text="已列印訂單" />
 
@@ -36,6 +42,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:padding="2dp"
+            android:textColor="@color/white"
+            android:drawableLeft="@android:drawable/ic_menu_send"
             android:background="@color/BaoBaoPrim"
             android:text="登入" />
     </LinearLayout>

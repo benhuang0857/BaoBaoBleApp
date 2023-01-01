@@ -2,6 +2,7 @@ package com.benhuang.baobaobluetoothprinter;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -69,6 +70,14 @@ public class MainActivity extends AppCompatActivity implements Runnable {
     MyListAdapter myListAdapter;
     private ArrayList<HashMap<String,String>> orderArrayList = new ArrayList<>();
     private List<HashMap<String, String>> datas = new ArrayList<>();
+
+    private ArrayList<HashMap<String,String>> unprintedOrderArrayList = new ArrayList<>();
+    private ArrayList<HashMap<String,String>> printedOrderArrayList = new ArrayList<>();
+    private List<HashMap<String, String>> unprintedDatas = new ArrayList<>();
+    private List<HashMap<String, String>> printedDatas = new ArrayList<>();
+    private ArrayList<String> unprintedOrderId = new ArrayList<>();
+    private ArrayList<String> printedOrderId = new ArrayList<>();
+
     Button mGetPrintedOrdersBtn, mGetUnPrintedOrdersBtn, mGetLoginBtn, mScan, mPrint;
     TextView stat;
 
@@ -111,8 +120,8 @@ public class MainActivity extends AppCompatActivity implements Runnable {
         swipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.blue_RURI));
         swipeRefreshLayout.setOnRefreshListener(()->{
 
-            printed_orders_page = true;
-            unprinted_orders_page = false;
+            unprinted_orders_page = true;
+            printed_orders_page = false;
 
             mGetUnPrintedOrdersBtn.setBackgroundColor(Color.parseColor("#F65D21"));
             mGetPrintedOrdersBtn.setBackgroundColor(Color.parseColor("#F0C362"));
@@ -128,14 +137,13 @@ public class MainActivity extends AppCompatActivity implements Runnable {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                freshHandler.sendEmptyMessage(1);
 
+                freshHandler.sendEmptyMessage(1);
                 if (orderArrayList.size() != 0)
                 {
                     final MediaPlayer dingSound = MediaPlayer.create(MainActivity.this, R.raw.notification);
                     dingSound.start();
                 }
-
                 freshHandler.postDelayed(this, 10*1000);
             }
         });
@@ -185,8 +193,8 @@ public class MainActivity extends AppCompatActivity implements Runnable {
             @Override
             public void onClick(View v) {
 
-                printed_orders_page = true;
-                unprinted_orders_page = false;
+                unprinted_orders_page = true;
+                printed_orders_page = false;
 
                 mGetUnPrintedOrdersBtn.setBackgroundColor(Color.parseColor("#F65D21"));
                 mGetPrintedOrdersBtn.setBackgroundColor(Color.parseColor("#F0C362"));
@@ -195,7 +203,6 @@ public class MainActivity extends AppCompatActivity implements Runnable {
                 datas.clear();
                 orderArrayList.clear();
                 getUnPrintedOrder();
-
                 myListAdapter.notifyDataSetChanged();
             }
         });
@@ -204,8 +211,8 @@ public class MainActivity extends AppCompatActivity implements Runnable {
             @Override
             public void onClick(View v) {
 
-                printed_orders_page = false;
-                unprinted_orders_page = true;
+                printed_orders_page = true;
+                unprinted_orders_page = false;
 
                 mGetUnPrintedOrdersBtn.setBackgroundColor(Color.parseColor("#F0C362"));
                 mGetPrintedOrdersBtn.setBackgroundColor(Color.parseColor("#F65D21"));
@@ -214,6 +221,7 @@ public class MainActivity extends AppCompatActivity implements Runnable {
                 datas.clear();
                 orderArrayList.clear();
                 getPrintedOrders();
+
                 myListAdapter.notifyDataSetChanged();
             }
         });
@@ -221,6 +229,9 @@ public class MainActivity extends AppCompatActivity implements Runnable {
         mGetLoginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                printed_orders_page = false;
+                unprinted_orders_page = false;
+
                 Intent intent = new Intent(MainActivity.this, LoginActivity.class);
                 startActivityForResult(intent, LOGIN_RESULT);
             }
@@ -233,275 +244,6 @@ public class MainActivity extends AppCompatActivity implements Runnable {
                 Log.d("mPrint result", "TEST");
             }
         });
-    }
-
-    public void printContext(ArrayList<HashMap<String,String>> req, int position, String owner) {
-        Thread t = new Thread() {
-            public void run() {
-                try {
-
-                    OutputStream os = mBluetoothSocket.getOutputStream();
-                    String blank = "";
-                    String header1 = "";
-                    String header2 = "";
-                    String customer = "";
-                    String header3 = "";
-                    String address = "";
-                    String header4 = "";
-                    String orders = "";
-                    String header5 = "";
-                    String mobile = "";
-                    String header6 = "";
-                    String discount = "";
-                    String header7 = "";
-                    String total = "";
-                    String header8 = "";
-                    String status = "";
-                    String header9 = "";
-                    String createat = "";
-                    String header10 = "";
-                    String tableware = "";
-                    String header11 = "";
-                    String NO = "";
-                    String footer = "";
-
-                    JChineseConvertor jChineseConvertor = JChineseConvertor.getInstance();
-
-                    blank = "\n\n";
-                    header1 = "    【"+owner+"】 BaoBaoPu Order\n";
-                    header1 = header1 + "********************************\n\n";
-
-                    header2 = "Customer:\n";
-                    customer += req.get(position).get("Customer") + "\n";
-                    customer = jChineseConvertor.t2s(customer)
-                            + "--------------------------------\n";
-                    header3 = "Address:\n";
-                    address = req.get(position).get("Address") + "\n";
-                    address = jChineseConvertor.t2s(address)
-                            + "--------------------------------\n";
-                    header4 = "Order:\n";
-
-                    String reqOrder = req.get(position).get("Orders");
-                    orders += "\n";
-                    String[] buff = reqOrder.split(" \\| ");
-                    for(int i = 0; i < buff.length; i++){
-                        orders += buff[i] + "\n";
-                    }
-                    orders = jChineseConvertor.t2s(orders)
-                            + "--------------------------------\n";
-                    header5 = "Tel:\n";
-                    mobile = req.get(position).get("Mobile") + "\n";
-                    mobile = jChineseConvertor.t2s(mobile)
-                            + "--------------------------------\n";
-                    header6 = "Discount:\n";
-                    discount = req.get(position).get("Discount") + "\n";
-                    discount = jChineseConvertor.t2s(discount)
-                            + "--------------------------------\n";
-                    header7 = "Total:\n";
-                    total = req.get(position).get("Total") + "\n";
-                    total = jChineseConvertor.t2s(total)
-                            + "--------------------------------\n";
-                    header8 = "Status:\n";
-                    status = req.get(position).get("Status") + "\n";
-                    status = jChineseConvertor.t2s(status)
-                            + "--------------------------------\n";
-                    header9 = "Time:\n";
-                    createat = req.get(position).get("CreatedAt") + "\n";
-                    createat = jChineseConvertor.t2s(createat)
-                            + "--------------------------------\n";
-
-                    header10 = "Tableware:\n";
-                    tableware = req.get(position).get("Tableware") + "\n";
-                    tableware = jChineseConvertor.t2s(tableware)
-                            + "--------------------------------\n";
-
-                    header11 = "No:\n";
-                    NO = req.get(position).get("No") + "\n";
-                    NO = jChineseConvertor.t2s(NO)
-                            + "--------------------------------\n";
-
-                    footer = "         BaoBaoPu CO.\n\n\n\n\n\n\n\n\n";
-
-                    byte[] fontstyle = new byte[]{0x1B,0x21,0x08}; // normal
-                    os.write(fontstyle);
-
-                    os.write(blank.getBytes("GB2312"));
-                    os.write(header1.getBytes("GB2312"));
-
-                    os.write(header11.getBytes("GB2312"));
-                    os.write(NO.getBytes("GB2312"));
-
-                    fontstyle = new byte[]{0x1B,0x21,0x16}; // 3- bold with large text
-                    os.write(fontstyle);
-
-                    os.write(header9.getBytes("GB2312"));
-                    os.write(createat.getBytes("GB2312"));
-
-                    os.write(header2.getBytes("GB2312"));
-                    os.write(customer.getBytes("GB2312"));
-
-                    os.write(header3.getBytes("GB2312"));
-                    os.write(address.getBytes("GB2312"));
-
-                    fontstyle = new byte[]{0x1B,0x21,0x08}; // normal
-                    os.write(fontstyle);
-
-                    os.write(header4.getBytes("GB2312"));
-                    os.write(orders.getBytes("GB2312"));
-
-                    os.write(header5.getBytes("GB2312"));
-                    os.write(mobile.getBytes("GB2312"));
-
-                    os.write(header6.getBytes("GB2312"));
-                    os.write(discount.getBytes("GB2312"));
-
-                    os.write(header7.getBytes("GB2312"));
-                    os.write(total.getBytes("GB2312"));
-
-                    os.write(header10.getBytes("GB2312"));
-                    os.write(tableware.getBytes("GB2312"));
-
-//                    os.write(header8.getBytes("GB2312"));
-//                    os.write(status.getBytes("GB2312"));
-
-                    os.write(footer.getBytes("GB2312"));
-
-                    // 切紙ESC指令
-                    os.write(new byte[]{ 0x1D,
-                            0x56,
-                            66,
-                            0x00});
-
-//                    // Setting height
-//                    int gs = 29;
-//                    os.write(intToByteArray(gs));
-//                    int h = 150;
-//                    os.write(intToByteArray(h));
-//                    int n = 170;
-//                    os.write(intToByteArray(n));
-//
-//                    // Setting Width
-//                    int gs_width = 29;
-//                    os.write(intToByteArray(gs_width));
-//                    int w = 119;
-//                    os.write(intToByteArray(w));
-//                    int n_width = 2;
-//                    os.write(intToByteArray(n_width));
-
-                } catch (Exception e) {
-                    Log.e("PrintActivity", "Exe ", e);
-                }
-            }
-        };
-        t.start();
-    }
-
-    public void printContextDemo() {
-        Thread t = new Thread() {
-            public void run() {
-                try {
-
-                    OutputStream os = mBluetoothSocket.getOutputStream();
-                    String blank = "";
-                    String header1 = "";
-                    String header2 = "";
-                    String customer = "";
-                    String header3 = "";
-                    String address = "";
-                    String header4 = "";
-                    String orders = "";
-                    String header5 = "";
-                    String mobile = "";
-                    String header6 = "";
-                    String discount = "";
-                    String header7 = "";
-                    String total = "";
-                    String header8 = "";
-                    String status = "";
-                    String header9 = "";
-                    String createat = "";
-                    String footer = "";
-
-                    JChineseConvertor jChineseConvertor = JChineseConvertor.getInstance();
-
-                    blank = "\n\n";
-                    header1 = "      BaoBaoPu Order\n";
-                    header1 = header1 + "********************************\n\n";
-
-                    header2 = "订购人:\n";
-                    customer += "海綿寶寶" + "\n";
-                    customer = jChineseConvertor.t2s(customer)
-                            + "--------------------------------\n";
-                    header3 = "位置:\n";
-                    address = "比奇堡" + "\n";
-                    address = jChineseConvertor.t2s(address)
-                            + "--------------------------------\n";
-                    header4 = "订单:\n";
-                    orders = "美味蟹堡X2 ----------- 300" + "\n";
-                    orders += "美味熱狗X5 ----------- 500" + "\n";
-                    orders = jChineseConvertor.t2s(orders)
-                            + "--------------------------------\n";
-                    header5 = "电话:\n";
-                    mobile = "28825252" + "\n";
-                    mobile = jChineseConvertor.t2s(mobile)
-                            + "--------------------------------\n";
-                    header6 = "折扣:\n";
-                    discount = "0" + "\n";
-                    discount = jChineseConvertor.t2s(discount)
-                            + "--------------------------------\n";
-                    header7 = "总金额:\n";
-                    total = "300元" + "\n";
-                    total = jChineseConvertor.t2s(total)
-                            + "--------------------------------\n";
-                    header8 = "状态:\n";
-                    status = "TEST" + "\n";
-                    status = jChineseConvertor.t2s(status)
-                            + "--------------------------------\n";
-                    header9 = "时间:\n";
-                    createat = formattedDate + "\n";
-                    createat = jChineseConvertor.t2s(createat)
-                            + "--------------------------------\n";
-
-                    footer = "         BaoBaoPu CO.\n\n\n\n\n\n\n\n\n";
-
-                    os.write(blank.getBytes("GB2312"));
-                    os.write(header1.getBytes("GB2312"));
-
-                    byte[] fontstyle = new byte[]{0x1B,0x21,0x16}; // 3- bold with large text
-                    os.write(fontstyle);
-
-                    os.write(header2.getBytes("GB2312"));
-                    os.write(customer.getBytes("GB2312"));
-                    os.write(header3.getBytes("GB2312"));
-                    os.write(address.getBytes("GB2312"));
-                    fontstyle = new byte[]{0x1B,0x21,0x08}; // 3- bold with large text
-                    os.write(fontstyle);
-                    os.write(header4.getBytes("GB2312"));
-                    os.write(orders.getBytes("GB2312"));
-                    os.write(header5.getBytes("GB2312"));
-                    os.write(mobile.getBytes("GB2312"));
-                    os.write(header6.getBytes("GB2312"));
-                    os.write(discount.getBytes("GB2312"));
-                    os.write(header7.getBytes("GB2312"));
-                    os.write(total.getBytes("GB2312"));
-                    os.write(header8.getBytes("GB2312"));
-                    os.write(status.getBytes("GB2312"));
-                    os.write(header9.getBytes("GB2312"));
-                    os.write(createat.getBytes("GB2312"));
-                    os.write(footer.getBytes("GB2312"));
-
-                    // 切紙ESC指令
-                    os.write(new byte[]{ 0x1D,
-                            0x56,
-                            66,
-                            0x00});
-
-                } catch (Exception e) {
-                    Log.e("PrintActivity", "Exe ", e);
-                }
-            }
-        };
-        t.start();
     }
 
     @Override
@@ -625,9 +367,6 @@ public class MainActivity extends AppCompatActivity implements Runnable {
     public void emptyScreen() {
         emptyView = (TextView) findViewById(R.id.empty_view);
 
-        boolean r = (myListAdapter.getItemCount() != 0);
-        int j = myListAdapter.getItemCount();
-
         if (myListAdapter.getItemCount() != 0) {
             mRecyclerView.setVisibility(View.VISIBLE);
             emptyView.setVisibility(View.GONE);
@@ -645,7 +384,12 @@ public class MainActivity extends AppCompatActivity implements Runnable {
             super.handleMessage(msg);
             switch (msg.what){
                 case 1:
+                    mGetUnPrintedOrdersBtn.setText("最新訂單("+ datas.size() + ")");
+
                     makeData(datas);
+
+                    makeUnprintedData(unprintedDatas);
+
                     mRecyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
                     mRecyclerView.setAdapter(new MyListAdapter(MainActivity.this, datas));
                     emptyScreen();
@@ -660,19 +404,10 @@ public class MainActivity extends AppCompatActivity implements Runnable {
             super.handleMessage(msg);
             switch (msg.what){
                 case 1:
-
                     if (isLogin == true)
                     {
                         findViewById(R.id.loadingProgressBar).setVisibility(View.VISIBLE);
                     }
-
-                    //設置RecycleView
-                    printed_orders_page = true;
-                    unprinted_orders_page = false;
-
-                    mGetUnPrintedOrdersBtn.setBackgroundColor(Color.parseColor("#F65D21"));
-                    mGetPrintedOrdersBtn.setBackgroundColor(Color.parseColor("#F0C362"));
-                    mGetLoginBtn.setBackgroundColor(Color.parseColor("#F0C362"));
 
                     mRecyclerView = findViewById(R.id.recycleview);
                     mRecyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
@@ -680,7 +415,13 @@ public class MainActivity extends AppCompatActivity implements Runnable {
                     mRecyclerView.setAdapter(myListAdapter);
                     datas.clear();
                     orderArrayList.clear();
-                    getUnPrintedOrder();
+
+                    if (unprinted_orders_page == true){
+                        getUnPrintedOrder();
+                    } else {
+                        getPrintedOrders();
+                    }
+
                     myListAdapter.notifyDataSetChanged();
                     break;
             }
@@ -732,6 +473,11 @@ public class MainActivity extends AppCompatActivity implements Runnable {
                             hashMap.put("OrderTableware", order.getTableware());
                             hashMap.put("OrderStatus", order.getOrderStatus());
                             hashMap.put("OrderCreatedAt", order.getOrderCreatedAt());
+
+                            if (!unprintedOrderId.contains(order.getOrderId())){
+                                unprintedOrderId.add(order.getOrderId());
+                                unprintedDatas.add(hashMap);
+                            }
 
                             datas.add(hashMap);
                         }
@@ -923,6 +669,293 @@ public class MainActivity extends AppCompatActivity implements Runnable {
         findViewById(R.id.loadingProgressBar).setVisibility(View.GONE);
     }
 
+    private void makeUnprintedData(@NonNull List<HashMap<String, String>> data) {
+        for (int i = 0; i < data.size();i++){
+            HashMap<String,String> hashMap = new HashMap<>();
+
+            hashMap.put("Id", data.get(i).get("OrderId"));
+            hashMap.put("No", data.get(i).get("OrderNum"));
+            hashMap.put("Customer", data.get(i).get("OrderName"));
+            hashMap.put("Address", data.get(i).get("OrderAddress"));
+            hashMap.put("Mobile", data.get(i).get("OrderMobile"));
+            hashMap.put("Orders", data.get(i).get("Orders"));
+            hashMap.put("Discount", data.get(i).get("OrderDiscount"));
+            hashMap.put("Total", data.get(i).get("OrderTotal"));
+            hashMap.put("Tableware", data.get(i).get("OrderTableware"));
+            hashMap.put("Status", data.get(i).get("OrderStatus"));
+            hashMap.put("CreatedAt", data.get(i).get("OrderCreatedAt"));
+
+            unprintedOrderArrayList.add(hashMap);
+        }
+
+        findViewById(R.id.loadingProgressBar).setVisibility(View.GONE);
+    }
+
+    public void printContext(ArrayList<HashMap<String,String>> req, int position, String owner) {
+        Thread t = new Thread() {
+            public void run() {
+                try {
+
+                    OutputStream os = mBluetoothSocket.getOutputStream();
+                    String blank = "";
+                    String header1 = "";
+                    String header2 = "";
+                    String customer = "";
+                    String header3 = "";
+                    String address = "";
+                    String header4 = "";
+                    String orders = "";
+                    String header5 = "";
+                    String mobile = "";
+                    String header6 = "";
+                    String discount = "";
+                    String header7 = "";
+                    String total = "";
+                    String header9 = "";
+                    String createat = "";
+                    String header10 = "";
+                    String tableware = "";
+                    String header11 = "";
+                    String NO = "";
+                    String footer = "";
+
+                    blank = "\n\n";
+                    header1 = "       BAO BAO PUO 【"+owner+"】\n";
+                    header1 = header1 + "********************************\n\n";
+
+                    header2 = "客戶名稱:\n";
+                    customer += req.get(position).get("Customer") + "\n";
+                    customer += "--------------------------------\n";
+
+                    header3 = "地址:\n";
+                    address = req.get(position).get("Address") + "\n";
+                    address += "--------------------------------\n";
+
+                    header4 = "訂單明細:\n";
+
+                    String reqOrder = req.get(position).get("Orders");
+                    orders += "\n";
+                    String[] buff = reqOrder.split(" \\| ");
+                    for(int i = 0; i < buff.length; i++){
+                        String[] tmpBuff = buff[i].split("X");
+                        orders += tmpBuff[0] + "-----------X";
+                        orders += tmpBuff[1] + "\n";
+                    }
+                    orders += "--------------------------------\n";
+
+                    header5 = "聯絡電話:\n";
+                    mobile = req.get(position).get("Mobile") + "\n";
+                    mobile += "--------------------------------\n";
+
+                    header6 = "折扣金額:\n";
+                    discount = req.get(position).get("Discount") + "\n";
+                    discount += "--------------------------------\n";
+
+                    header7 = "總金額:\n";
+                    total = req.get(position).get("Total") + "\n";
+                    total += "--------------------------------\n";
+
+                    header9 = "時間:\n";
+                    createat = req.get(position).get("CreatedAt") + "\n";
+                    createat += "--------------------------------\n";
+
+                    String Tableware2CH = req.get(position).get("Tableware");
+                    if (Tableware2CH == "true")
+                    {
+                        Tableware2CH = "需要";
+                    }else {
+                        Tableware2CH = "不需要";
+                    }
+
+                    header10 = "是否需要餐具:\n";
+                    tableware = Tableware2CH + "\n";
+                    tableware += "--------------------------------\n";
+
+                    header11 = "No:\n";
+                    NO = req.get(position).get("No") + "\n";
+                    NO += "--------------------------------\n";
+
+                    footer = "        BAO BAO PUO CO.\n\n\n\n\n\n\n\n\n";
+
+                    byte[] fontstyle = new byte[]{0x1B,0x21,0x06}; // normal
+                    os.write(fontstyle);
+
+                    os.write(blank.getBytes("GBK"));
+                    os.write(header1.getBytes("GBK"));
+
+                    os.write(header11.getBytes("GBK"));
+                    os.write(NO.getBytes("GBK"));
+
+                    fontstyle = new byte[]{0x1B,0x16,0x12}; // 3- bold with large text
+                    os.write(fontstyle);
+
+                    os.write(header9.getBytes("GBK"));
+                    os.write(createat.getBytes("GBK"));
+
+                    os.write(header2.getBytes("GBK"));
+                    os.write(customer.getBytes("GBK"));
+
+                    os.write(header3.getBytes("GBK"));
+                    os.write(address.getBytes("GBK"));
+
+                    fontstyle = new byte[]{0x1B,0x21,0x06}; // normal
+                    os.write(fontstyle);
+
+                    os.write(header4.getBytes("GBK"));
+                    os.write(orders.getBytes("GBK"));
+
+                    os.write(header5.getBytes("GBK"));
+                    os.write(mobile.getBytes("GBK"));
+
+                    os.write(header6.getBytes("GBK"));
+                    os.write(discount.getBytes("GBK"));
+
+                    os.write(header7.getBytes("GBK"));
+                    os.write(total.getBytes("GBK"));
+
+                    os.write(header10.getBytes("GBK"));
+                    os.write(tableware.getBytes("GBK"));
+
+                    os.write(footer.getBytes("GBK"));
+
+                    // 切紙ESC指令
+                    os.write(new byte[]{ 0x1D,
+                            0x56,
+                            66,
+                            0x00});
+
+                    /*
+                    // Setting height
+                    int gs = 29;
+                    os.write(intToByteArray(gs));
+                    int h = 150;
+                    os.write(intToByteArray(h));
+                    int n = 170;
+                    os.write(intToByteArray(n));
+
+                    // Setting Width
+                    int gs_width = 29;
+                    os.write(intToByteArray(gs_width));
+                    int w = 119;
+                    os.write(intToByteArray(w));
+                    int n_width = 2;
+                    os.write(intToByteArray(n_width));
+                    */
+
+                } catch (Exception e) {
+                    Log.e("PrintActivity", "Exe ", e);
+                }
+            }
+        };
+        t.start();
+    }
+
+    public void printContextDemo() {
+        Thread t = new Thread() {
+            public void run() {
+                try {
+
+                    OutputStream os = mBluetoothSocket.getOutputStream();
+                    String blank = "";
+                    String header1 = "";
+                    String header2 = "";
+                    String customer = "";
+                    String header3 = "";
+                    String address = "";
+                    String header4 = "";
+                    String orders = "";
+                    String header5 = "";
+                    String mobile = "";
+                    String header6 = "";
+                    String discount = "";
+                    String header7 = "";
+                    String total = "";
+                    String header8 = "";
+                    String status = "";
+                    String header9 = "";
+                    String createat = "";
+                    String footer = "";
+
+                    blank = "\n\n";
+                    header1 = "      BaoBaoPu Order\n";
+                    header1 = header1 + "********************************\n\n";
+
+                    header2 = "訂購人:\n";
+                    customer += "海綿寶寶" + "\n";
+                    customer += "--------------------------------\n";
+
+                    header3 = "位置:\n";
+                    address = "比奇堡" + "\n";
+                    address += "--------------------------------\n";
+
+                    header4 = "訂單:\n";
+                    orders = "美味蟹堡X2 ----------- 300" + "\n";
+                    orders += "美味熱狗X5 ----------- 500" + "\n";
+                    orders += "--------------------------------\n";
+
+                    header5 = "電話:\n";
+                    mobile = "28825252" + "\n";
+                    mobile += "--------------------------------\n";
+
+                    header6 = "折扣:\n";
+                    discount = "0" + "\n";
+                    discount += "--------------------------------\n";
+
+                    header7 = "總金額:\n";
+                    total = "300元" + "\n";
+                    total += "--------------------------------\n";
+
+                    header8 = "狀態:\n";
+                    status = "TEST" + "\n";
+                    status += "--------------------------------\n";
+
+                    header9 = "時間:\n";
+                    createat = formattedDate + "\n";
+                    createat += "--------------------------------\n";
+
+
+                    footer = "         BaoBaoPu CO.\n\n\n\n\n\n\n\n\n";
+
+                    os.write(blank.getBytes("GBK"));
+                    os.write(header1.getBytes("GBK"));
+
+                    byte[] fontstyle = new byte[]{0x1B,0x21,0x16}; // 3- bold with large text
+                    os.write(fontstyle);
+
+                    os.write(header2.getBytes("GBK"));
+                    os.write(customer.getBytes("GBK"));
+                    os.write(header3.getBytes("GBK"));
+                    os.write(address.getBytes("GBK"));
+                    fontstyle = new byte[]{0x1B,0x21,0x06}; // 3- bold with large text
+                    os.write(fontstyle);
+                    os.write(header4.getBytes("GBK"));
+                    os.write(orders.getBytes("GBK"));
+                    os.write(header5.getBytes("GBK"));
+                    os.write(mobile.getBytes("GBK"));
+                    os.write(header6.getBytes("GBK"));
+                    os.write(discount.getBytes("GBK"));
+                    os.write(header7.getBytes("GBK"));
+                    os.write(total.getBytes("GBK"));
+                    os.write(header8.getBytes("GBK"));
+                    os.write(status.getBytes("GBK"));
+                    os.write(header9.getBytes("GBK"));
+                    os.write(createat.getBytes("GBK"));
+                    os.write(footer.getBytes("GBK"));
+
+                    // 切紙ESC指令
+                    os.write(new byte[]{ 0x1D,
+                            0x56,
+                            66,
+                            0x00});
+
+                } catch (Exception e) {
+                    Log.e("PrintActivity", "Exe ", e);
+                }
+            }
+        };
+        t.start();
+    }
+
     private class MyListAdapter extends RecyclerView.Adapter<MyListAdapter.ViewHolder>{
 
         public MyListAdapter(MainActivity mainActivity, List<HashMap<String, String>> datas) {}
@@ -951,6 +984,10 @@ public class MainActivity extends AppCompatActivity implements Runnable {
                 txtItem = (TextView) itemView.findViewById(R.id.printOrderMobile);
                 btnPrint = (Button) itemView.findViewById(R.id.printBtn);
                 btnCancel = (Button) itemView.findViewById(R.id.cancelBtn);
+
+                if(printed_orders_page == true) {
+                    btnPrint.setText("再次列印");
+                }
             }
         }
 
@@ -983,13 +1020,13 @@ public class MainActivity extends AppCompatActivity implements Runnable {
             holder.btnPrint.setOnClickListener((v)->{
 
                 String id = orderArrayList.get(position).get("Id").toString();
-                printContext(orderArrayList, position, "Shop");
+                printContext(orderArrayList, position, "IN");
                 updateOrder(id);
 
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        printContext(orderArrayList, position, "Customer");
+                        printContext(orderArrayList, position, "OUT");
                         freshHandler.sendEmptyMessage(1);
                     }
                 }, 1500);
