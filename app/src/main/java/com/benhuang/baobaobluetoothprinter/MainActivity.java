@@ -384,7 +384,7 @@ public class MainActivity extends AppCompatActivity implements Runnable {
             super.handleMessage(msg);
             switch (msg.what){
                 case 1:
-                    mGetUnPrintedOrdersBtn.setText("最新訂單("+ datas.size() + ")");
+                    mGetUnPrintedOrdersBtn.setText("最新訂單("+ unprintedDatas.size() + ")");
 
                     makeData(datas);
 
